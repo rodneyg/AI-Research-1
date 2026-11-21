@@ -79,6 +79,14 @@ AI should be allowed to say:
 
 > No real issue found.
 
+## Quiz deployment patch
+
+This repository contains the study and a patch for the quiz. The quiz source lives in a separate deployment snapshot.
+
+See the [deployment patch instructions](deployment-fixes/README.md) for the required snapshot and build commands. Run `git apply --check` first. If it fails, stop and confirm you have the source snapshot named in the instructions.
+
+See the [changelog](CHANGELOG.md) for changes included in this repository.
+
 ## Sources
 
 - [Does AI Code Review Lead to Code Changes?](https://arxiv.org/html/2508.18771v2)
