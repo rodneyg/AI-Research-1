@@ -12,9 +12,11 @@ One tool may say the code is fine. Another tool may find more issues. Then the r
 
 Did it find a real problem, or did it find something because we asked it to look?
 
-## Demo Idea
+## Try the quiz
 
-Show a small piece of working code:
+In the [Signal or Noise quiz](https://rodneyg.github.io/AI-Research-1/), classify three example review comments on each of three code snippets. The quiz uses preset comments and answers, gives feedback after each choice, and shows a score at the end.
+
+Here is a separate example of the kind of code a reviewer might see:
 
 ```ts
 type LineItem = {
@@ -30,7 +32,7 @@ export function subtotalCents(items: LineItem[]) {
 }
 ```
 
-Then show AI review comments like:
+An AI reviewer might leave comments like these:
 
 - What if quantity is below zero?
 - What if priceCents is not a whole number?
@@ -64,10 +66,10 @@ A weak AI review comment:
 
 ## What The Research Says
 
-- One study of 16 AI review tools found valid AI comments led to code changes 0.9% to 19.2% of the time. Human comments led to changes 60% of the time.
-- One code review test found correct code got bad AI suggestions up to 24.8% of the time.
-- Atlassian tested a filtered AI reviewer. Its comments led to fixes 38.7% of the time.
-- A Tencent study found AI plus static analysis removed 94% to 98% of false alarms.
+- A study of 16 GitHub review actions analyzed four in depth. It classified 0.9% to 19.2% of AI comments, depending on the action, and 60.0% of human comments as valid and fully addressed (Table IX).
+- In one evaluation, up to 24.8% of correct code samples received suggestions that broke the code.
+- Atlassian reported a 38.7% code resolution rate for its RovoDev reviewer and 44.45% for human comments in its final measurement period.
+- In a Tencent study, one method combining LLMs with static analysis filtered out 94% to 98% of false alarms, depending on the model.
 
 ## Takeaway
 
@@ -81,13 +83,23 @@ AI should be allowed to say:
 
 ## Quiz source and static build
 
-The quiz source in `demo/` was recovered from the original Vercel deployment snapshot. From `demo/`, install with `pnpm install --frozen-lockfile`, run `node .v0/inject-built-with-v0.mjs`, then run `pnpm build`. The static site is written to `demo/out/`. The GitHub Pages workflow builds the site with the configured mount path.
+The quiz source in `demo/` was recovered from the original Vercel deployment snapshot. The Pages workflow uses Node.js 24 and pnpm 10.11.0. With those installed, run these commands from the repository root.
+
+```sh
+cd demo &&
+pnpm install --frozen-lockfile &&
+node .v0/inject-built-with-v0.mjs &&
+pnpm build &&
+pnpm exec tsc --noEmit
+```
+
+The build writes the static site to `demo/out/`. The GitHub Pages workflow sets `NEXT_PUBLIC_BASE_PATH` from the Pages configuration and publishes that directory.
 
 ## Vercel deployment patches
 
-The existing patches below target the original snapshot.
+The accessibility patches are kept separately for the original Vercel snapshot. The GitHub Pages workflow builds the checked-in quiz source without applying them.
 
-See the [deployment patch instructions](deployment-fixes/README.md) for the required snapshot and build commands. Run `git apply --check` first. If it fails, stop and confirm you have the source snapshot named in the instructions.
+See the [deployment patch instructions](deployment-fixes/README.md) for the required snapshot, patch order, and build commands.
 
 See the [changelog](CHANGELOG.md) for changes included in this repository.
 
