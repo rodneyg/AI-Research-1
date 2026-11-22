@@ -97,7 +97,7 @@ The build writes the static site to `demo/out/`. The GitHub Pages workflow sets 
 
 ## Vercel deployment patches
 
-The accessibility patches are kept separately for the original Vercel snapshot. The GitHub Pages workflow builds the checked-in quiz source without applying them.
+The GitHub Pages quiz includes its own text contrast fixes and a Site credits landmark. Its workflow builds the checked-in quiz source. The separate patch files target the original Vercel snapshot.
 
 See the [deployment patch instructions](deployment-fixes/README.md) for the required snapshot, patch order, and build commands.
 
