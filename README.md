@@ -79,9 +79,13 @@ AI should be allowed to say:
 
 > No real issue found.
 
-## Quiz deployment patch
+## Quiz source and static build
 
-This repository contains the study and a patch for the quiz. The quiz source lives in a separate deployment snapshot.
+The quiz source in `demo/` was recovered from the original Vercel deployment snapshot. From `demo/`, install with `pnpm install --frozen-lockfile`, run `node .v0/inject-built-with-v0.mjs`, then run `pnpm build`. The static site is written to `demo/out/`. The GitHub Pages workflow builds the site with the configured mount path.
+
+## Vercel deployment patches
+
+The existing patches below target the original snapshot.
 
 See the [deployment patch instructions](deployment-fixes/README.md) for the required snapshot and build commands. Run `git apply --check` first. If it fails, stop and confirm you have the source snapshot named in the instructions.
 
