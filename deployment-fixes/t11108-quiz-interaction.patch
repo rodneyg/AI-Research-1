@@ -1,0 +1,177 @@
+diff --git a/components/code-panel.tsx b/components/code-panel.tsx
+index 4d625c9..251e236 100644
+--- a/components/code-panel.tsx
++++ b/components/code-panel.tsx
+@@ -7,12 +7,17 @@ type Props = {
+ 
+ export function CodePanel({ filename, code }: Props) {
+   return (
+-    <section className="rounded-xl border border-border bg-card">
++    <section className="min-w-0 rounded-xl border border-border bg-card">
+       <header className="flex items-center gap-2 border-b border-border px-4 py-2.5">
+         <FileCode2 className="size-4 text-muted-foreground" aria-hidden="true" />
+         <span className="font-mono text-xs text-muted-foreground">{filename}</span>
+       </header>
+-      <pre className="overflow-x-auto px-4 py-4">
++      <pre
++        role="region"
++        aria-label={`Code example: ${filename}`}
++        tabIndex={0}
++        className="overflow-x-auto px-4 py-4 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
++      >
+         <code className="font-mono text-[0.8rem] leading-relaxed text-foreground">{code}</code>
+       </pre>
+     </section>
+diff --git a/components/review-comment-card.tsx b/components/review-comment-card.tsx
+index 446eca8..f3e00f2 100644
+--- a/components/review-comment-card.tsx
++++ b/components/review-comment-card.tsx
+@@ -25,20 +25,26 @@ export function ReviewCommentCard({ comment, index, choice, onChoose }: Props) {
+           <p className="text-sm font-medium text-pretty text-foreground">{comment.text}</p>
+ 
+           <p className="mt-2 text-xs text-muted-foreground">Real signal, or just noise?</p>
+-          <div className="mt-2 flex flex-wrap items-center gap-2">
++          <div
++            role="group"
++            aria-label={`Comment ${index + 1} verdict`}
++            className="mt-2 flex flex-wrap items-center gap-2"
++          >
+             <Button
+               size="sm"
+               variant={choice === "signal" ? "default" : "outline"}
++              aria-pressed={choice === "signal"}
+               onClick={() => onChoose("signal")}
+-              className={cn(choice === "signal" && "bg-signal text-signal-foreground [a]:hover:bg-signal/80")}
++              className={cn("min-h-11 min-w-11 sm:min-h-0 sm:min-w-0", choice === "signal" && "bg-signal text-signal-foreground [a]:hover:bg-signal/80")}
+             >
+               Signal
+             </Button>
+             <Button
+               size="sm"
+               variant={choice === "noise" ? "default" : "outline"}
++              aria-pressed={choice === "noise"}
+               onClick={() => onChoose("noise")}
+-              className={cn(choice === "noise" && "bg-noise text-noise-foreground [a]:hover:bg-noise/80")}
++              className={cn("min-h-11 min-w-11 sm:min-h-0 sm:min-w-0", choice === "noise" && "bg-noise text-noise-foreground [a]:hover:bg-noise/80")}
+             >
+               Noise
+             </Button>
+diff --git a/components/score-panel.tsx b/components/score-panel.tsx
+index fe93ad9..d167ac8 100644
+--- a/components/score-panel.tsx
++++ b/components/score-panel.tsx
+@@ -1,3 +1,4 @@
++import type { Ref } from "react"
+ import { RotateCcw } from "lucide-react"
+ import { Button } from "@/components/ui/button"
+ 
+@@ -7,12 +8,15 @@ type Props = {
+   signalTotal: number
+   noiseTotal: number
+   onRestart: () => void
++  headingRef: Ref<HTMLHeadingElement>
+ }
+ 
+-export function ScorePanel({ correct, total, signalTotal, noiseTotal, onRestart }: Props) {
++export function ScorePanel({ correct, total, signalTotal, noiseTotal, onRestart, headingRef }: Props) {
+   return (
+     <section className="rounded-xl border border-border bg-card p-5">
+-      <h2 className="text-sm font-semibold text-foreground">Your result</h2>
++      <h2 ref={headingRef} tabIndex={-1} className="text-sm font-semibold text-foreground">
++        Your result
++      </h2>
+ 
+       <p className="mt-2 text-3xl font-semibold text-foreground">
+         {correct} <span className="text-lg font-normal text-muted-foreground">of {total} right</span>
+@@ -34,7 +38,7 @@ export function ScorePanel({ correct, total, signalTotal, noiseTotal, onRestart
+         comments is not the same as more help.
+       </p>
+ 
+-      <Button variant="outline" className="mt-4 bg-transparent" onClick={onRestart}>
++      <Button variant="outline" className="mt-4 min-h-11 bg-transparent sm:min-h-0" onClick={onRestart}>
+         <RotateCcw className="size-4" aria-hidden="true" />
+         Start over
+       </Button>
+diff --git a/components/signal-noise-demo.tsx b/components/signal-noise-demo.tsx
+index 5985f5b..0393a14 100644
+--- a/components/signal-noise-demo.tsx
++++ b/components/signal-noise-demo.tsx
+@@ -1,6 +1,6 @@
+ "use client"
+ 
+-import { useMemo, useState } from "react"
++import { useEffect, useMemo, useRef, useState } from "react"
+ import { ArrowRight } from "lucide-react"
+ import { Button } from "@/components/ui/button"
+ import { CodePanel } from "@/components/code-panel"
+@@ -11,9 +11,18 @@ import { EXAMPLES, type Verdict } from "@/lib/review-data"
+ export function SignalNoiseDemo() {
+   const [step, setStep] = useState(0)
+   const [finished, setFinished] = useState(false)
++  const headingRef = useRef<HTMLHeadingElement>(null)
++  const focusNextHeading = useRef(false)
+   // Keyed by comment id so choices persist across steps.
+   const [choices, setChoices] = useState<Record<string, Verdict>>({})
+ 
++  useEffect(() => {
++    if (focusNextHeading.current) {
++      focusNextHeading.current = false
++      headingRef.current?.focus()
++    }
++  }, [step, finished])
++
+   const example = EXAMPLES[step]
+ 
+   const choose = (id: string, verdict: Verdict) => {
+@@ -24,6 +33,7 @@ export function SignalNoiseDemo() {
+   const isLastStep = step === EXAMPLES.length - 1
+ 
+   const next = () => {
++    focusNextHeading.current = true
+     if (isLastStep) {
+       setFinished(true)
+     } else {
+@@ -32,6 +42,7 @@ export function SignalNoiseDemo() {
+   }
+ 
+   const restart = () => {
++    focusNextHeading.current = true
+     setStep(0)
+     setChoices({})
+     setFinished(false)
+@@ -55,6 +66,7 @@ export function SignalNoiseDemo() {
+         signalTotal={signalTotal}
+         noiseTotal={noiseTotal}
+         onRestart={restart}
++        headingRef={headingRef}
+       />
+     )
+   }
+@@ -71,15 +83,15 @@ export function SignalNoiseDemo() {
+           />
+         ))}
+       </div>
+-      <p className="-mt-3 text-xs text-muted-foreground">
++      <h2 ref={headingRef} tabIndex={-1} className="-mt-3 text-xs text-muted-foreground">
+         Example {step + 1} of {EXAMPLES.length}
+-      </p>
++      </h2>
+ 
+       <CodePanel filename={example.filename} code={example.code} />
+ 
+       {/* Comments */}
+       <section className="grid gap-3">
+-        <h2 className="text-sm font-semibold text-foreground">The AI left {example.comments.length} comments</h2>
++        <h3 className="text-sm font-semibold text-foreground">The AI left {example.comments.length} comments</h3>
+         <ul className="grid gap-3">
+           {example.comments.map((comment, i) => (
+             <ReviewCommentCard
+@@ -93,7 +105,7 @@ export function SignalNoiseDemo() {
+         </ul>
+       </section>
+ 
+-      <Button onClick={next} disabled={!allMarkedThisStep}>
++      <Button onClick={next} disabled={!allMarkedThisStep} className="min-h-11 sm:min-h-0">
+         {isLastStep ? "See result" : "Next example"}
+         <ArrowRight className="size-4" aria-hidden="true" />
+       </Button>
