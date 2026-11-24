@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CodePanel } from "@/components/code-panel"
@@ -11,8 +11,17 @@ import { EXAMPLES, type Verdict } from "@/lib/review-data"
 export function SignalNoiseDemo() {
   const [step, setStep] = useState(0)
   const [finished, setFinished] = useState(false)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const focusNextHeading = useRef(false)
   // Keyed by comment id so choices persist across steps.
   const [choices, setChoices] = useState<Record<string, Verdict>>({})
+
+  useEffect(() => {
+    if (focusNextHeading.current) {
+      focusNextHeading.current = false
+      headingRef.current?.focus()
+    }
+  }, [step, finished])
 
   const example = EXAMPLES[step]
 
@@ -24,6 +33,7 @@ export function SignalNoiseDemo() {
   const isLastStep = step === EXAMPLES.length - 1
 
   const next = () => {
+    focusNextHeading.current = true
     if (isLastStep) {
       setFinished(true)
     } else {
@@ -32,6 +42,7 @@ export function SignalNoiseDemo() {
   }
 
   const restart = () => {
+    focusNextHeading.current = true
     setStep(0)
     setChoices({})
     setFinished(false)
@@ -55,6 +66,7 @@ export function SignalNoiseDemo() {
         signalTotal={signalTotal}
         noiseTotal={noiseTotal}
         onRestart={restart}
+        headingRef={headingRef}
       />
     )
   }
@@ -71,15 +83,15 @@ export function SignalNoiseDemo() {
           />
         ))}
       </div>
-      <p className="-mt-3 text-xs text-muted-foreground">
+      <h2 ref={headingRef} tabIndex={-1} className="-mt-3 text-xs text-muted-foreground">
         Example {step + 1} of {EXAMPLES.length}
-      </p>
+      </h2>
 
       <CodePanel filename={example.filename} code={example.code} />
 
       {/* Comments */}
       <section className="grid gap-3">
-        <h2 className="text-sm font-semibold text-foreground">The AI left {example.comments.length} comments</h2>
+        <h3 className="text-sm font-semibold text-foreground">The AI left {example.comments.length} comments</h3>
         <ul className="grid gap-3">
           {example.comments.map((comment, i) => (
             <ReviewCommentCard
@@ -93,7 +105,7 @@ export function SignalNoiseDemo() {
         </ul>
       </section>
 
-      <Button onClick={next} disabled={!allMarkedThisStep}>
+      <Button onClick={next} disabled={!allMarkedThisStep} className="min-h-11 sm:min-h-0">
         {isLastStep ? "See result" : "Next example"}
         <ArrowRight className="size-4" aria-hidden="true" />
       </Button>
