@@ -25,20 +25,26 @@ export function ReviewCommentCard({ comment, index, choice, onChoose }: Props) {
           <p className="text-sm font-medium text-pretty text-foreground">{comment.text}</p>
 
           <p className="mt-2 text-xs text-muted-foreground">Real signal, or just noise?</p>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
+          <div
+            role="group"
+            aria-label={`Comment ${index + 1} verdict`}
+            className="mt-2 flex flex-wrap items-center gap-2"
+          >
             <Button
               size="sm"
               variant={choice === "signal" ? "default" : "outline"}
+              aria-pressed={choice === "signal"}
               onClick={() => onChoose("signal")}
-              className={cn(choice === "signal" && "bg-signal text-signal-foreground [a]:hover:bg-signal/80")}
+              className={cn("min-h-11 min-w-11 sm:min-h-0 sm:min-w-0", choice === "signal" && "bg-signal text-signal-foreground [a]:hover:bg-signal/80")}
             >
               Signal
             </Button>
             <Button
               size="sm"
               variant={choice === "noise" ? "default" : "outline"}
+              aria-pressed={choice === "noise"}
               onClick={() => onChoose("noise")}
-              className={cn(choice === "noise" && "bg-noise text-noise-foreground [a]:hover:bg-noise/80")}
+              className={cn("min-h-11 min-w-11 sm:min-h-0 sm:min-w-0", choice === "noise" && "bg-noise text-noise-foreground [a]:hover:bg-noise/80")}
             >
               Noise
             </Button>
