@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-23
+
+- Improved keyboard navigation in the GitHub Pages quiz. Focus moves to each new example, the results, and the first example when restarting. Answer buttons expose their selected state to screen readers, long code lines scroll in a named keyboard-focusable region, and quiz buttons are larger on narrow screens. ([#8](https://github.com/rodneyg/AI-Research-1/pull/8))
+
 ## 2026-11-22
 
 - Improved text contrast in the GitHub Pages quiz in light and dark mode. The attribution controls are now grouped in a Site credits landmark for screen readers. ([#6](https://github.com/rodneyg/AI-Research-1/pull/6))
