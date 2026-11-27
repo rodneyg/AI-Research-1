@@ -14,6 +14,12 @@ Did it find a real problem, or did it find something because we asked it to look
 
 ## Try the quiz
 
+The hosted quiz starts with three preset review comments. After all three examples, it shows which comments were signal and which were noise.
+
+![The Signal or Noise quiz starting example with three preset code review comments](docs/screenshots/quiz-start.png)
+
+![The completed quiz result showing 9 of 9 answers correct, with 3 signal comments and 6 noise comments](docs/screenshots/quiz-results.png)
+
 In the [Signal or Noise quiz](https://rodneyg.github.io/AI-Research-1/), classify three example review comments on each of three code snippets. The quiz uses preset comments and answers, gives feedback after each choice, and shows a score at the end.
 
 Here is a separate example of the kind of code a reviewer might see:
